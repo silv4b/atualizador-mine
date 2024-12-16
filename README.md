@@ -26,14 +26,10 @@ O arquivo `config.txt` deve conter as seguintes informações:
 ```txt
 REPO_URL=https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git
 USERNAME=seu_usuario
-PASSWORD=sua_senha
 ```
 
 - `REPO_URL`: URL do repositório GitHub.
 - `USERNAME`: (Opcional para repositórios públicos) Seu nome de usuário no GitHub.
-- `PASSWORD`: (Opcional para repositórios públicos) Sua senha ou token de acesso pessoal.
-
-> **Nota**: Para repositórios públicos, `USERNAME` e `PASSWORD` podem ser omitidos.
 
 ## Como Usar
 
@@ -46,6 +42,7 @@ PASSWORD=sua_senha
 2. Escolha a operação desejada:
    - **1**: Baixar arquivos do repositório (pull).
    - **2**: Enviar arquivos para o repositório (push).
+   - **3**. Abrir pasta do save
 
 ### Exemplo de Uso
 
@@ -60,7 +57,7 @@ Se você deseja apenas baixar os arquivos de um repositório público:
 
 Se você deseja enviar arquivos para um repositório privado:
 
-- Configure o `REPO_URL`, `USERNAME` e `PASSWORD` no `config.txt`.
+- Configure o `REPO_URL` e `USERNAME` no `config.txt`.
 - Certifique-se de que as alterações estão salvas no diretório local.
 - Execute o script e escolha a opção `2`.
 
