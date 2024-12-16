@@ -1,0 +1,2 @@
+REPO_URL=https://github.com/silv4b/sk-mine-save.git
+USERNAME=silv4b
