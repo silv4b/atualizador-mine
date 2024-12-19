@@ -41,6 +41,7 @@ def git_clone(repo_url: str, repo_dir: str):
             subprocess.run(["git", "clone", repo_url], check=True)
             print("✅ Repositório clonado com sucesso.")
         except subprocess.CalledProcessError:
+            # CalledProcessError acontece quando a saída de um run() é diferente de 0 (non-zero) e check=True.
             print("❌ Erro ao clonar o repositório.")
             sys.exit(1)
     else:
@@ -65,7 +66,8 @@ def has_changes(repo_dir: str):
     os.chdir(repo_dir)
     result = subprocess.run(["git", "status", "--porcelain"], stdout=subprocess.PIPE)
     os.chdir("..")
-    return bool(result.stdout.strip())  # Se a saída não for vazia, há alterações
+    vazio = result.stdout.strip()  # Se a saída não for vazia, há alterações
+    return bool(vazio)
 
 
 def git_pull(repo_url: str, repo_dir: str):
@@ -84,24 +86,25 @@ def git_push(repo_dir: str):
     if has_changes(repo_dir):
         os.chdir(repo_dir)
 
-        # Primeiro, fazemos o git fetch para verificar se há alterações no repositório remoto
+        # Primeiro, faz git fetch para verificar se há alterações no repositório remoto
         try:
             subprocess.run(["git", "fetch"], check=True)
             print("🔄 Atualizações do repositório remoto baixadas com sucesso.")
         except subprocess.CalledProcessError as e:
-            print(f"❌ Erro ao executar git fetch. Detalhes: {e}")
+            print(f"❌ Erro ao executar git fetch.\nDetalhes: {e}")
             os.chdir("..")
             sys.exit(1)
 
         # Comparamos se há alterações no repositório remoto em relação ao local
         result = subprocess.run(
             ["git", "log", "HEAD..origin/main", "--oneline"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stdout=subprocess.PIPE,  # Guarda saída padrão
+            stderr=subprocess.PIPE,  # guarda saída de erro
         )
 
-        if result.stdout:
+        if result.stdout:  # se stdout não for vazio, quer dizer que tem alterações
             print("🔄 O repositório remoto tem alterações mais recentes.")
+            print(f"🔄 Saída: {result.stdout.decode()}")
             print(
                 "\n🛑 Por favor, faça um git pull para atualizar seu repositório local antes de enviar as alterações."
             )
@@ -112,10 +115,16 @@ def git_push(repo_dir: str):
             print("📤 Executando git push...")
             subprocess.run(["git", "add", "."], check=True)
             subprocess.run(
-                ["git", "commit", "-m", f"Atualização: {get_datetime()}"], check=True
+                [
+                    "git",
+                    "commit",
+                    "-m",
+                    f"[{get_user()}] Atualização: {get_datetime()}",
+                ],
+                check=True,
             )
             subprocess.run(["git", "push"], check=True)
-            print("✅ Push concluído com sucesso.")
+            print("\n✅ Push concluído com sucesso.")
         except subprocess.CalledProcessError as e:
             # Detectar erro específico
             if "Authentication failed" in str(e):
@@ -129,12 +138,12 @@ def git_push(repo_dir: str):
                     "❌ O repositório remoto não está acessível. Verifique a URL do repositório."
                 )
             else:
-                print(f"❌ Erro ao executar git push. Detalhes: {e}")
+                print(f"❌ Erro ao executar git push.\nDetalhes: {e}")
             os.chdir("..")
             sys.exit(1)
         os.chdir("..")
     else:
-        print("⚠️ Não há alterações para enviar. O repositório já está atualizado.")
+        print("\n🛑 Não há alterações para enviar. O repositório já está atualizado.")
 
 
 def force_remove(file_path: str):
@@ -173,16 +182,15 @@ def remove_repo_folder(repo_dir: str):
             print(f"❌ Erro ao remover a pasta: {e}")
             sys.exit(1)
     else:
-        print("⚠️ Pasta do repositório não encontrada.")
+        print("\n🛑 Pasta do repositório não encontrada.")
 
 
 def open_save_folder(repo_dir: str = "", repo_folder: bool = False):
     if repo_folder:
-        caminho = os.path.dirname(os.path.abspath(__file__))
-        subprocess.run(f"cd /d {caminho}/{repo_dir} && explorer .", shell=True)
+        caminho = os.path.dirname(os.path.abspath(__file__)) + f"/{repo_dir}"
     else:
         caminho = f"C:/Users/{get_user()}/AppData/Roaming/.minecraft/saves"
-        subprocess.run(f"cd /d {caminho} && explorer .", shell=True)
+    subprocess.run(f"cd /d {caminho} && explorer .", shell=True)
 
 
 def get_datetime():

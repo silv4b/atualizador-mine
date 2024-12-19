@@ -85,6 +85,12 @@ O script realiza as seguintes operações:
 3. **Erro ao executar comandos Git**:
    - Certifique-se de que o `git` está instalado e que você tem permissão para acessar o repositório.
 
+## Gerando instalador
+
+Para gerar o instalador, usamos o pyinstaller.
+
+Execute o comando `pyinstaller --onefile -w 'main.py'`
+
 ## Melhorias Futuras
 
 [Em construção]
